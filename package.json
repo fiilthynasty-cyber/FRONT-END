@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "validate:package": "node scripts/validate-package-json.mjs",
+    "ci:check": "npm run validate:package && npm run lint && npm run build",
+    "vercel-build": "npm run ci:check"
   },
   "dependencies": {
     "react": "^19.2.0",
