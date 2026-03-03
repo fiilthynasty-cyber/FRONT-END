@@ -65,13 +65,13 @@ This repo now includes:
 
 - `vercel-build` script that runs `npm run ci:check`
 
-If your Vercel project uses the default build command, set it to:
+This repository includes `vercel.json` with:
 
-```bash
-npm run vercel-build
+```json
+{ "buildCommand": "npm run vercel-build" }
 ```
 
-This ensures malformed `package.json` is caught before Vite build.
+So Vercel will run package validation + lint + build via `vercel-build` by default.
 
 ## Pre-launch checklist
 
