@@ -22,21 +22,33 @@ body {
 }
 
 .dashboard {
-  width: min(780px, 100%);
+  width: min(820px, 100%);
   background: #fff;
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 12px 32px rgba(17, 24, 39, 0.1);
 }
 
-.subtext {
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title-row h1 {
+  margin: 0;
+}
+
+.subtext,
+.meta {
   color: #4b5563;
-  margin-top: 0.5rem;
+  margin: 0.5rem 0;
   overflow-wrap: anywhere;
+  font-size: 0.95rem;
 }
 
 .refresh-button {
-  margin: 1rem 0;
   border: none;
   border-radius: 10px;
   padding: 0.6rem 1rem;

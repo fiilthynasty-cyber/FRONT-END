@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 const DASHBOARD_PATH = import.meta.env.VITE_DASHBOARD_PATH ?? "/api/dashboard";
+const REQUEST_TIMEOUT_MS = Number(import.meta.env.VITE_REQUEST_TIMEOUT_MS ?? 8000);
 
 function resolveEndpoint(baseUrl, path) {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
@@ -13,15 +14,17 @@ function resolveEndpoint(baseUrl, path) {
   return `${baseUrl.replace(/\/$/, "")}${normalizedPath}`;
 }
 
-function getBackendDataShape(payload) {
-  if (payload && typeof payload === "object") {
-    if ("data" in payload && payload.data !== undefined) {
-      return payload.data;
-    }
+function unwrapBackendPayload(payload) {
+  if (!payload || typeof payload !== "object") {
+    return payload;
+  }
 
-    if ("result" in payload && payload.result !== undefined) {
-      return payload.result;
-    }
+  if ("data" in payload && payload.data !== undefined) {
+    return payload.data;
+  }
+
+  if ("result" in payload && payload.result !== undefined) {
+    return payload.result;
   }
 
   return payload;
@@ -43,7 +46,7 @@ function formatValue(value) {
   return String(value);
 }
 
-function renderEntries(value) {
+function Results({ value }) {
   if (Array.isArray(value)) {
     if (!value.length) {
       return <p className="empty">No records returned.</p>;
@@ -94,6 +97,7 @@ export default function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   const endpoint = useMemo(() => resolveEndpoint(API_BASE_URL, DASHBOARD_PATH), []);
 
@@ -101,11 +105,13 @@ export default function Dashboard() {
     setLoading(true);
     setError("");
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
     try {
       const response = await fetch(endpoint, {
-        headers: {
-          Accept: "application/json",
-        },
+        headers: { Accept: "application/json" },
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -113,11 +119,17 @@ export default function Dashboard() {
       }
 
       const payload = await response.json();
-      setData(getBackendDataShape(payload));
+      setData(unwrapBackendPayload(payload));
+      setLastUpdated(new Date());
     } catch (err) {
       setData(null);
-      setError(err instanceof Error ? err.message : "Unknown error");
+      if (err instanceof Error && err.name === "AbortError") {
+        setError(`Request timed out after ${REQUEST_TIMEOUT_MS}ms`);
+      } else {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      }
     } finally {
+      clearTimeout(timeout);
       setLoading(false);
     }
   }, [endpoint]);
@@ -128,12 +140,15 @@ export default function Dashboard() {
 
   return (
     <main className="dashboard">
-      <h1>Dashboard</h1>
-      <p className="subtext">Connected endpoint: {endpoint}</p>
+      <div className="title-row">
+        <h1>Dashboard</h1>
+        <button onClick={loadDashboard} disabled={loading} className="refresh-button">
+          {loading ? "Loading..." : "Refresh"}
+        </button>
+      </div>
 
-      <button onClick={loadDashboard} disabled={loading} className="refresh-button">
-        {loading ? "Loading..." : "Refresh"}
-      </button>
+      <p className="subtext">Endpoint: {endpoint}</p>
+      {lastUpdated && <p className="meta">Last updated: {lastUpdated.toLocaleString()}</p>}
 
       {error && (
         <p className="error">
@@ -141,7 +156,7 @@ export default function Dashboard() {
         </p>
       )}
 
-      {!error && !loading && renderEntries(data)}
+      {!error && !loading && <Results value={data} />}
     </main>
   );
 }

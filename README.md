@@ -1,33 +1,36 @@
 # IntentFlow Frontend
 
-React + Vite dashboard connected to backend API responses.
+React + Vite dashboard that reads backend API data.
 
-## Make it match your backend
+## Make it better matched to your backend
 
-Use a `.env` file in the project root.
+Create `.env` in the project root and choose one mode.
 
-### Option A (recommended for local dev, avoids CORS): Vite proxy
+### Proxy mode (recommended for local dev)
 
 ```bash
 VITE_DASHBOARD_PATH=/api/dashboard
 VITE_PROXY_TARGET=http://localhost:5000
+VITE_REQUEST_TIMEOUT_MS=8000
 ```
 
-- Frontend will call `/api/dashboard`.
+- Frontend calls `VITE_DASHBOARD_PATH` (for example `/api/dashboard`).
 - Vite forwards `/api/*` to `VITE_PROXY_TARGET`.
 
-### Option B: direct backend URL
+### Direct mode
 
 ```bash
 VITE_API_BASE_URL=http://localhost:5000
 VITE_DASHBOARD_PATH=/api/dashboard
+VITE_REQUEST_TIMEOUT_MS=8000
 ```
 
 - Frontend calls `VITE_API_BASE_URL + VITE_DASHBOARD_PATH` directly.
 
-The dashboard supports common backend shapes:
-- raw object/array values
-- envelope responses like `{ data: ... }` or `{ result: ... }`
+## Supported backend response shapes
+
+- Raw object/array/scalar payloads.
+- Envelope payloads like `{ data: ... }` and `{ result: ... }`.
 
 ## Scripts
 
