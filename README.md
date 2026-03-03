@@ -49,7 +49,7 @@ If deploy logs show JSON parse errors like `Expected ',' or '}' after property v
 npm run validate:package
 ```
 
-This runs a dedicated validator script (`scripts/validate-package-json.mjs`) to parse `package.json` and fail fast if commas/braces/quotes are invalid.
+This runs a dedicated validator script (`scripts/validate-package-json.mjs`) to parse `package.json`, fail fast on invalid JSON, and print approximate line/column + context for errors like `position 700`.
 
 For CI / Vercel, use:
 
