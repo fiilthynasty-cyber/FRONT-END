@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { healthCheck, getLeads } from "./api";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 export default function App() {
   const [status, setStatus] = useState("Checking...");
@@ -46,6 +47,7 @@ export default function App() {
           </div>
         )}
       </main>
+      <SpeedInsights />
     </div>
   );
 }
