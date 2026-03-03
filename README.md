@@ -51,13 +51,35 @@ npm run validate:package
 
 This checks `package.json` syntax exactly as JSON and fails fast if commas/braces are invalid.
 
+For CI / Vercel, use:
+
+```bash
+npm run ci:check
+```
+
+This runs package validation, lint, and production build in one command.
+
+## Vercel configuration note
+
+This repo now includes:
+
+- `vercel-build` script that runs `npm run ci:check`
+
+If your Vercel project uses the default build command, set it to:
+
+```bash
+npm run vercel-build
+```
+
+This ensures malformed `package.json` is caught before Vite build.
+
 ## Pre-launch checklist
 
 - Confirm `VITE_DASHBOARD_PATH` matches your backend route exactly.
 - In direct mode, confirm backend CORS allows your frontend origin.
 - Validate timeout value (`VITE_REQUEST_TIMEOUT_MS`) for your environment.
 - Validate package syntax with `npm run validate:package`.
-- Run lint and build before deployment.
+- Run full checks with `npm run ci:check`.
 
 ## Scripts
 
@@ -67,4 +89,6 @@ npm run lint
 npm run build
 npm run preview
 npm run validate:package
+npm run ci:check
+npm run vercel-build
 ```
