@@ -1,0 +1,9 @@
+CREATE TABLE leads (
+    id SERIAL PRIMARY KEY,
+    business_name VARCHAR(100),
+    url VARCHAR(255),
+    score FLOAT,
+    status VARCHAR(50) DEFAULT 'New',
+    last_interaction TEXT,
+    personalized_message TEXT
+);
